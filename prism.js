@@ -232,15 +232,20 @@ var _ = _self.Prism = {
 		_.hooks.run('before-highlight', env);
 
 		// replace "innerHTMl"
-		var rejectHTML = function(target, content) {
-			while (target.firstChild) {
-				target.removeChild(target.firstChild);
-			}
-			var child = content;
-			if (typeof child === 'string') {
-				child = document.createTextNode(child);
-			}
-			target.appendChild(child);
+		var injectHTML = function(target, content) {
+			while (target.firstChild) target.removeChild(target.firstChild);
+
+			var stringToDOM = function(content) {
+				if (typeof content === 'string') {
+					const parser = new DOMParser()
+					return parser.parseFromString(content, 'text/html').body.childNodes;
+				}
+				return [content];
+			};
+		
+			Array.prototype.forEach.call(stringToDOM(content), function(child) {
+				target.appendChild(child);
+			});
 		}
 		
 		if (async && _self.Worker) {
@@ -251,7 +256,7 @@ var _ = _self.Prism = {
 
 				_.hooks.run('before-insert', env);
 
-				rejectHTML(env.element, env.highlightedCode);
+				injectHTML(env.element, env.highlightedCode);
 
 				_.hooks.run('after-highlight', env);
 				_.hooks.run('complete', env);
@@ -269,7 +274,7 @@ var _ = _self.Prism = {
 
 			_.hooks.run('before-insert', env);
 
-			rejectHTML(env.element, env.highlightedCode);
+			injectHTML(env.element, env.highlightedCode);
 
 			_.hooks.run('after-highlight', env);
 
