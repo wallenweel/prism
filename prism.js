@@ -231,6 +231,18 @@ var _ = _self.Prism = {
 
 		_.hooks.run('before-highlight', env);
 
+		// replace "innerHTMl"
+		var rejectHTML = function(target, content) {
+			while (target.firstChild) {
+				target.removeChild(target.firstChild);
+			}
+			var child = content;
+			if (typeof child === 'string') {
+				child = document.createTextNode(child);
+			}
+			target.appendChild(child);
+		}
+		
 		if (async && _self.Worker) {
 			var worker = new Worker(_.filename);
 
@@ -239,7 +251,7 @@ var _ = _self.Prism = {
 
 				_.hooks.run('before-insert', env);
 
-				env.element.innerHTML = env.highlightedCode;
+				rejectHTML(env.element, env.highlightedCode);
 
 				_.hooks.run('after-highlight', env);
 				_.hooks.run('complete', env);
@@ -257,7 +269,7 @@ var _ = _self.Prism = {
 
 			_.hooks.run('before-insert', env);
 
-			env.element.innerHTML = env.highlightedCode;
+			rejectHTML(env.element, env.highlightedCode);
 
 			_.hooks.run('after-highlight', env);
 
