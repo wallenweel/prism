@@ -238,7 +238,7 @@ var _ = _self.Prism = {
 			var stringToDOM = function(content) {
 				if (typeof content === 'string') {
 					const parser = new DOMParser()
-					return parser.parseFromString(content, 'text/html').body.childNodes;
+					return Array.prototype.slice.call(parser.parseFromString(content, 'text/html').body.childNodes);
 				}
 				return [content];
 			};
